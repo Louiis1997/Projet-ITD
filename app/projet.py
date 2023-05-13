@@ -1,7 +1,7 @@
 import os
-from pyspark.sql.functions import desc
+from pyspark.sql.types import *
 from pyspark.ml.feature import StopWordsRemover
-from pyspark.sql.functions import col, lower, regexp_replace, split, explode, length, array
+from pyspark.sql.functions import col, lower, regexp_replace, split, explode, length, array, desc, trim
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import sum, count, to_date, date_sub, current_date, date_format
 from time import sleep
@@ -14,10 +14,19 @@ spark = SparkSession \
 
 full_file = "app/data/full.csv"
 
+schema = StructType([
+    StructField("commit", StringType(), True),
+    StructField("author", StringType(), True),
+    StructField("date", StringType(), True),
+    StructField("message", StringType(), True),
+    StructField("repo", StringType(), True)
+])
+
 df = spark.read \
     .option("header", "true") \
     .option("inferSchema", "true") \
     .option("multiline", "true") \
+    .schema(schema) \
     .load(full_file, format="csv")
 
 
